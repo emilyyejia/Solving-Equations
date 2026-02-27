@@ -6,7 +6,6 @@ import { CompassRose } from './custom-compass-challenge-3/CompassRose';
 import { Modal } from './custom-compass-challenge-3/Modal';
 import { Position, Direction, Rotation } from './custom-compass-challenge-3/types';
 import { GRID_SIZE, INITIAL_EXPLORER_POS, MOVES_FOR_LEVEL_2_TRIGGER, OBSTACLE_POSITIONS } from './custom-compass-challenge-3/constants';
-import InstructionButton from '../../components/InstructionButton';
 import InstructionModal from '../../components/InstructionModal';
 
 // Helper function to generate a new treasure position
@@ -176,7 +175,6 @@ const CustomCompassChallenge3: React.FC<LevelComponentProps> = ({ onComplete, on
 
   return (
     <div className="min-h-full h-full bg-gradient-to-br from-sky-400 to-blue-600 flex flex-col items-center justify-center p-4 text-white selection:bg-sky-700 selection:text-white">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={isModalOpen && movesMade === 0 && currentLevel === 1} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

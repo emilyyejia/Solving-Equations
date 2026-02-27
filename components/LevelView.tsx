@@ -44,17 +44,17 @@ const LevelView: React.FC<LevelViewProps> = ({ level, onBackToMap, onComplete, o
   return (
     <div className={`fixed inset-0 bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4 flex flex-col animate-fade-in ${isHighContrast ? 'high-contrast' : ''}`}>
       <div className="relative z-[101] flex-shrink-0 mb-4 flex items-center justify-between">
-        {lessonTitle ? (
-            <h1 className="text-xl font-bold text-sky-300 tracking-wide">
-                {lessonTitle}{level.name ? `: ${level.name}` : ''}
-            </h1>
-        ) : <div />}
         <button
           onClick={onBackToMap}
           className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           &larr; Back to Map
         </button>
+        {lessonTitle ? (
+            <h1 className="text-xl font-bold text-sky-300 tracking-wide">
+                {lessonTitle}{level.name ? `: ${level.name}` : ''}
+            </h1>
+        ) : <div />}
       </div>
 
       <div id="level-content-container" ref={contentWrapperRef} className="flex-grow relative overflow-auto">

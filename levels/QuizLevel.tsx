@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps, QuizQuestion } from '../types';
 import { generateQuiz } from '../services/geminiService';
 import Spinner from '../components/Spinner';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
+import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
 
 const QuizLevel: React.FC<LevelComponentProps> = ({ topic, onComplete, questions: questionsProp, partialProgress, onSavePartialProgress }) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>(() => partialProgress?.questions || []);
@@ -14,6 +14,8 @@ const QuizLevel: React.FC<LevelComponentProps> = ({ topic, onComplete, questions
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [score, setScore] = useState(() => partialProgress?.score || 0);
   const [isLoading, setIsLoading] = useState(() => !questions.length);
+  const [isLevelComplete, setIsLevelComplete] = useState(false);
+  const [finalStars, setFinalStars] = useState(0);
   const isCompletedRef = useRef(false);
   const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
 
@@ -93,38 +95,42 @@ const QuizLevel: React.FC<LevelComponentProps> = ({ topic, onComplete, questions
   }
   
   if (currentQuestionIndex >= questions.length) {
-    const percentage = questions.length > 0 ? score / questions.length : 0;
-    let stars = 0;
-    if (percentage === 1) { // All correct
-        stars = 3;
-    } else if (percentage >= 0.6) { // 60% or more
-        stars = 2;
-    } else if (score > 0) { // At least one correct
-        stars = 1;
+    if (!isLevelComplete) {
+      const percentage = questions.length > 0 ? score / questions.length : 0;
+      let stars = 0;
+      if (percentage === 1) { // All correct
+          stars = 3;
+      } else if (percentage >= 0.6) { // 60% or more
+          stars = 2;
+      } else if (score > 0) { // At least one correct
+          stars = 1;
+      }
+      setFinalStars(stars);
+      setIsLevelComplete(true);
     }
 
-    const handleComplete = (stars: number) => {
-        isCompletedRef.current = true;
-        onComplete(stars);
+    const handleReplay = () => {
+      onSavePartialProgress?.(null);
+      window.location.reload();
     };
 
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
+        {isLevelComplete && (
+          <ChallengeCompleteModal
+            stars={finalStars}
+            onReplay={handleReplay}
+            onBackToMap={() => { isCompletedRef.current = true; onComplete(finalStars); }}
+          />
+        )}
         <h2 className="text-4xl font-bold text-sky-400 mb-4">Quiz Complete!</h2>
         <p className="text-xl mb-6">You scored {score} out of {questions.length}.</p>
-        <button
-          onClick={() => handleComplete(stars)}
-          className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform duration-200 hover:scale-105"
-        >
-          Complete Level
-        </button>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-4">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

@@ -10,7 +10,6 @@ import {
 } from './custom-grid-nav-2/constants';
 import type { Landmark, LevelData, Player, Instruction, Move } from './custom-grid-nav-2/types';
 import type { LevelComponentProps } from '../../types';
-import InstructionButton from '../../components/InstructionButton';
 import InstructionModal from '../../components/InstructionModal';
 
 // Helper function to shuffle array
@@ -479,7 +478,6 @@ const CustomGridNavChallenge2: React.FC<LevelComponentProps> = ({ onComplete, on
   
   return (
     <main className="bg-slate-100 min-h-screen w-full flex items-center justify-center p-4 font-sans">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={isIntroModalOpen} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

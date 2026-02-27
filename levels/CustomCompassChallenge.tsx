@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../../types';
 import Pointer from '../components/custom/Compass';
 import LevelIndicator from '../components/custom/LevelIndicator';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 type DirectionName = 'North' | 'East' | 'South' | 'West';
@@ -324,7 +323,6 @@ const CustomCompassChallenge: React.FC<LevelComponentProps> = ({ onComplete, onE
 
   return (
     <div className="min-h-full h-full bg-[#132B53] flex flex-col items-center justify-center p-4 text-center select-none antialiased relative">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={showIntroduction} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

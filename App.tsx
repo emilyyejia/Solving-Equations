@@ -149,14 +149,6 @@ const LevelNode: React.FC<{ level: Level; status: LevelStatus; stars: number; on
                     <StarIcon key={i} filled={i <= stars} className="w-3.5 h-3.5" />
                 ))}
             </div>
-            {!isCompleted && (
-                <button 
-                    onClick={(e) => { e.stopPropagation(); onCompleteLevel(level.id, 3); }}
-                    className="border border-[#eab308] rounded-md py-1 px-4 text-[#eab308] text-[9px] font-black uppercase tracking-widest hover:bg-[#eab3081a] transition-all active:scale-95"
-                >
-                    <span className="mr-1">🔒</span> Unlock
-                </button>
-            )}
         </div>
     );
 };

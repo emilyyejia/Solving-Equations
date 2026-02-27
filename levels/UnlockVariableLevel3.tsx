@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
-import InstructionModal from '../components/InstructionModal';
 import ProgressDots from '../components/ProgressDots';
 import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
+import InstructionModal from '../components/InstructionModal';
 
 interface EquationProblem {
   id: number;
@@ -92,14 +91,9 @@ const UnlockVariableLevel3: React.FC<LevelComponentProps> = ({ onComplete, onExi
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[110]">
         <ProgressDots 
           currentStep={problemIndex + 1} 
-          totalSteps={PROBLEMS.length} 
-          onStepClick={(s) => {
-            setProblemIndex(s - 1);
-            setFieldErrors(new Set());
-          }}
+          totalSteps={PROBLEMS.length}
         />
       </div>
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
       <InstructionModal isOpen={isInstructionOpen} onClose={() => setIsInstructionOpen(false)} title="Mastery Challenge">
         <p>Solve the following equations. You can use any methods: guessing, table of values, balancing model, inverse operations.</p>
         <p className="text-sm mt-2 text-gray-400 italic font-bold">Incorrect or incomplete boxes will be outlined in red after you click check.</p>
@@ -110,19 +104,17 @@ const UnlockVariableLevel3: React.FC<LevelComponentProps> = ({ onComplete, onExi
           stars={getStars()}
           onReplay={handleReplay}
           onBackToMap={() => { isCompletedRef.current = true; onComplete(getStars()); }}
-          hintMessage="Focus on accurate steps to earn 3 stars!"
         />
       )}
 
       <div className="w-full max-w-4xl bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700 mt-8">
-        <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest text-center">Mastery: Solve and Verify</h2>
         <div className="text-5xl font-mono mb-10 font-bold bg-gray-900/50 px-8 py-6 rounded-3xl border border-gray-700 text-center text-white">
            {p.equation}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
           <div className="bg-gray-900/40 p-6 rounded-2xl border border-gray-700">
-             <h3 className="text-sky-300 font-bold mb-4 uppercase text-sm">Step 1: Solve for x</h3>
+             <h3 className="text-sky-300 font-bold mb-4 uppercase text-lg">Step 1: Solve for x</h3>
              <div className="flex items-center justify-center gap-4 text-4xl">
                <span className="font-mono text-white">x = </span>
                <input 
@@ -140,7 +132,7 @@ const UnlockVariableLevel3: React.FC<LevelComponentProps> = ({ onComplete, onExi
           </div>
 
           <div className="bg-gray-900/40 p-6 rounded-2xl border border-gray-700">
-             <h3 className="text-emerald-400 font-bold mb-4 uppercase text-sm">Step 2: Verify Solution</h3>
+             <h3 className="text-emerald-400 font-bold mb-4 uppercase text-lg">Step 2: Verify Solution</h3>
              <div className="space-y-4 font-mono text-xl text-white">
                {problemIndex === 0 ? (
                  <>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 interface ExternalChallengeLevelProps extends LevelComponentProps {
@@ -150,7 +149,6 @@ const ExternalChallengeLevel: React.FC<ExternalChallengeLevelProps> = ({ onCompl
 
   return (
     <div className="w-full h-full relative">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

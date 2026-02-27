@@ -10,7 +10,6 @@ import Modal from '../../components/custom-grid-nav/Modal';
 import StarRating from '../../components/custom-grid-nav/StarRating';
 import ProgressBar from '../../components/custom-grid-nav/ProgressBar';
 import type { LevelComponentProps } from '../../types';
-import InstructionButton from '../../components/InstructionButton';
 import InstructionModal from '../../components/InstructionModal';
 
 // Helper function to shuffle array
@@ -370,7 +369,6 @@ const CustomGridNavChallenge: React.FC<LevelComponentProps> = ({ onComplete, onE
   
   return (
     <main className="bg-slate-100 min-h-screen w-full flex items-center justify-center p-4 font-sans">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={isIntroModalOpen} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

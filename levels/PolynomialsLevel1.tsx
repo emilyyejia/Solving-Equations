@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
+import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
 
 type SortItem = {
   id: string;
@@ -33,6 +33,8 @@ const PHASE2_ITEMS: SortItem[] = [
 
 const PolynomialsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, partialProgress, onSavePartialProgress }) => {
   const [phase, setPhase] = useState<1 | 2>(() => partialProgress?.phase || 1);
+  const [errorCount, setErrorCount] = useState(() => partialProgress?.errorCount || 0);
+  const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [isInstructionOpen, setIsInstructionOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [assignments, setAssignments] = useState<Record<string, string>>({});
@@ -43,10 +45,10 @@ const PolynomialsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, 
   useEffect(() => {
     return () => {
       if (!isCompletedRef.current && onSavePartialProgress) {
-        onSavePartialProgress({ phase });
+        onSavePartialProgress({ phase, errorCount });
       }
     };
-  }, [onSavePartialProgress, phase]);
+  }, [onSavePartialProgress, phase, errorCount]);
 
   const items = phase === 1 ? PHASE1_ITEMS : PHASE2_ITEMS;
   const categories = phase === 1 ? ['Monomials', 'Binomials'] : ['Degree 1', 'Degree 2', 'Degree 3+'];
@@ -77,6 +79,10 @@ const PolynomialsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, 
 
     setFeedback(newFeedback);
 
+    if (!allCorrect) {
+      setErrorCount(prev => prev + 1);
+    }
+
     if (allCorrect) {
       setTimeout(() => {
         if (phase === 1) {
@@ -84,18 +90,29 @@ const PolynomialsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, 
           setAssignments({});
           setFeedback({});
         } else {
-          isCompletedRef.current = true;
-          onComplete(3);
+          setIsLevelComplete(true);
         }
       }, 2000);
     }
+  };
+
+  const handleReplay = () => {
+    onSavePartialProgress?.(null);
+    window.location.reload();
   };
 
   const isEveryItemAssigned = items.every(i => !!assignments[i.id]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-6 text-white bg-gray-900 font-sans max-w-6xl mx-auto">
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
+      {isLevelComplete && (
+        <ChallengeCompleteModal
+          stars={errorCount === 0 ? 3 : errorCount <= 2 ? 2 : 1}
+          onReplay={handleReplay}
+          onBackToMap={() => { isCompletedRef.current = true; onComplete(errorCount === 0 ? 3 : errorCount <= 2 ? 2 : 1); }}
+        />
+      )}
+
       <InstructionModal
         isOpen={isInstructionOpen}
         onClose={() => setIsInstructionOpen(false)}
@@ -181,7 +198,7 @@ const PolynomialsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, 
       </div>
 
       <div className="mt-12 flex flex-col items-center gap-4">
-        {phase === 2 && <p className="text-sky-300 font-bold">Write a simplified expression.</p>}
+        {phase === 2 && <p className="text-sky-300 text-xl font-bold">Write a simplified expression.</p>}
         <button
           onClick={handleCheck}
           disabled={!isEveryItemAssigned}

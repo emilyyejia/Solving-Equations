@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { LevelComponentProps, StoryChunk } from '../types';
 import { generateStoryChunk } from '../services/geminiService';
 import Spinner from '../components/Spinner';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 const StoryLevel: React.FC<LevelComponentProps> = ({ topic, onComplete }) => {
@@ -49,7 +48,6 @@ const StoryLevel: React.FC<LevelComponentProps> = ({ topic, onComplete }) => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-4">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

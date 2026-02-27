@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 import ProgressDots from '../components/ProgressDots';
 import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
@@ -33,10 +32,9 @@ const DividingPercentLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
   return (
     <div className="flex flex-col items-center justify-center h-full p-4 text-white relative font-sans">
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[110]">
-        <ProgressDots currentStep={taskIndex + 1} totalSteps={totalTasks} onStepClick={(s) => setTaskIndex(s - 1)} />
+        <ProgressDots currentStep={taskIndex + 1} totalSteps={totalTasks} />
       </div>
 
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
       <InstructionModal
         isOpen={isInstructionOpen}
         onClose={() => setIsInstructionOpen(false)}
@@ -54,7 +52,6 @@ const DividingPercentLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
           stars={3}
           onReplay={() => { onSavePartialProgress?.(null); window.location.reload(); }}
           onBackToMap={() => { isCompletedRef.current = true; onComplete(3); }}
-          hintMessage="Try to visualize the whole and its parts!"
         />
       )}
 

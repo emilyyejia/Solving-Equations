@@ -14,7 +14,6 @@ import {
 } from './custom-map-scales-2/mapScalesConstants2';
 import type { Landmark, PlacedBlock, BlockOrientation, LevelData, LevelSolution } from './custom-map-scales-2/mapScalesTypes2';
 import type { LevelComponentProps } from '../../types';
-import InstructionButton from '../../components/InstructionButton';
 import InstructionModal from '../../components/InstructionModal';
 
 const StarIcon: React.FC<{ filled: boolean; className?: string }> = ({ filled, className = "w-10 h-10 md:w-12 md:h-12 mx-1" }) => (
@@ -326,7 +325,6 @@ const CustomMapScalesChallenge2: React.FC<LevelComponentProps> = ({ onComplete, 
   return (
     <DndProvider backend={backendForDND} options={{ enableMouseEvents: true }}>
       <main className="bg-slate-100 min-h-screen w-full flex items-center justify-center p-4 font-sans">
-        <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
         <InstructionModal
             isOpen={isInstructionModalOpen}
             onClose={() => setIsInstructionModalOpen(false)}

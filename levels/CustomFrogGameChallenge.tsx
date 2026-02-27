@@ -13,7 +13,6 @@ import {
   DYNAMIC_FLY_DURATION_MS,
   DYNAMIC_FLY_RESPAWN_DELAY_MS
 } from './custom-frog-game/frogGameConstants';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -321,7 +320,6 @@ const CustomFrogGameChallenge: React.FC<LevelComponentProps> = ({ onComplete, on
 
   return (
     <div className="min-h-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white flex flex-col items-center justify-center p-4 selection:bg-teal-600 selection:text-white">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={!gameStarted} />
       <InstructionModal
           isOpen={isInstructionModalOpen}
           onClose={() => setIsInstructionModalOpen(false)}

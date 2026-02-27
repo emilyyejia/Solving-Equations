@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
+import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
 
 const BuildingMultiplesLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, partialProgress, onSavePartialProgress }) => {
   const [taskIndex, setTaskIndex] = useState(() => partialProgress?.taskIndex || 0);
+  const [errorCount, setErrorCount] = useState(() => partialProgress?.errorCount || 0);
+  const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [isInstructionOpen, setIsInstructionOpen] = useState(false);
   const totalTasks = 4; // Placeholder count
   const isCompletedRef = useRef(false);
@@ -14,24 +16,27 @@ const BuildingMultiplesLevel1: React.FC<LevelComponentProps> = ({ onComplete, on
   useEffect(() => {
     return () => {
       if (!isCompletedRef.current && onSavePartialProgress) {
-        onSavePartialProgress({ taskIndex });
+        onSavePartialProgress({ taskIndex, errorCount });
       }
     };
-  }, [onSavePartialProgress, taskIndex]);
+  }, [onSavePartialProgress, taskIndex, errorCount]);
 
   const handleNext = () => {
     if (taskIndex < totalTasks - 1) {
       setTaskIndex(prev => prev + 1);
     } else {
-      isCompletedRef.current = true;
-      onComplete(3); // Complete with 3 stars
+      setIsLevelComplete(true);
     }
+  };
+
+  const handleReplay = () => {
+    onSavePartialProgress?.(null);
+    window.location.reload();
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-4 text-white relative font-sans">
       {/* Instruction UI */}
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
       <InstructionModal
         isOpen={isInstructionOpen}
         onClose={() => setIsInstructionOpen(false)}
@@ -39,6 +44,14 @@ const BuildingMultiplesLevel1: React.FC<LevelComponentProps> = ({ onComplete, on
       >
         <p>Instructions for this level go here.</p>
       </InstructionModal>
+
+      {isLevelComplete && (
+        <ChallengeCompleteModal
+          stars={3}
+          onReplay={handleReplay}
+          onBackToMap={() => { isCompletedRef.current = true; onComplete(3); }}
+        />
+      )}
 
       {/* Progress Dots */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2">

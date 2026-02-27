@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 interface VideoLevelProps extends LevelComponentProps {
@@ -110,7 +109,6 @@ const VideoLevel: React.FC<VideoLevelProps> = ({ onComplete, onExit, url, topic,
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

@@ -10,7 +10,6 @@ import {
   ALL_LANDMARKS, GRID_ROWS, GRID_COLS
 } from './custom-map-scales-3/constants';
 import type { Landmark, LevelData, ScheduleItem, Direction, PlacedArrow } from './custom-map-scales-3/types';
-import InstructionButton from '../../components/InstructionButton';
 import InstructionModal from '../../components/InstructionModal';
 
 // Helper function to shuffle array
@@ -341,7 +340,6 @@ const CustomMapScalesChallenge3: React.FC<LevelComponentProps> = ({ onComplete, 
 
   return (
     <main className="bg-slate-100 min-h-screen w-full flex flex-col items-center justify-center p-4 font-sans">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} disabled={showWelcomeModal} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}

@@ -1,8 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
-import InstructionModal from '../components/InstructionModal';
 import ProgressDots from '../components/ProgressDots';
 import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
 
@@ -69,15 +67,13 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
     setFeedback({ message: msg, type });
     if (type === 'error') {
       setErrorCount(prev => prev + 1);
-      setTimeout(() => setFeedback(null), 6000);
-    } else {
-        setTimeout(() => setFeedback(null), 2500);
     }
   };
 
   const normalize = (str: string) => str.replace(/\s+/g, '').toLowerCase();
 
   const handleStep1 = () => {
+    setFeedback(null);
     if (!s1ShowX) {
       const target = `${p1Config.xCount}x+${p1Config.constWeight}=${p1Config.total}`;
       const targetAlt = `${p1Config.constWeight}+${p1Config.xCount}x=${p1Config.total}`;
@@ -86,52 +82,54 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
         showFeedback("Correct Equation! Now solve for x.", 'success');
         setS1ShowX(true);
       } else {
-        showFeedback("Concept Hint: If a scale has 5 boxes (b) and a 10-unit weight on one side balancing a 35-unit weight, the equation is 5b + 10 = 35.", 'error');
+        showFeedback("Not quite — count the X boxes and the number tile. Almost there! What equation shows what you have on the left equals the total?", 'error');
       }
     } else {
       if (parseInt(s1X) === p1Config.sol) {
         showFeedback("Well done!", 'success');
         setTimeout(() => { setStep(2); setFeedback(null); }, 1000);
       } else {
-        showFeedback("Think: If 10 identical apples cost $20, how much is one apple? (20 / 10). Try subtracting the extra weight from the total first!", 'error');
+        showFeedback("Not quite — remove the extra weight first. Almost there! What should you do after subtracting to find one X?", 'error');
       }
     }
   };
 
   const handleStep2 = () => {
+    setFeedback(null);
     if (!s2ShowX) {
       const target = `4x+${2 * p2Config.k}=${p2Config.total}`;
       if (normalize(s2Eq) === target) {
         showFeedback("Expression correct! Now find x.", 'success');
         setS2ShowX(true);
       } else {
-        showFeedback("Concept Hint: For a rectangular garden with length 'w' and width 'w + 8', the perimeter is w + (w+8) + w + (w+8), which is 4w + 16.", 'error');
+        showFeedback(`Not quite — add all 4 sides together. Almost there! What is x + y + x + y when y = x + ${p2Config.k}?`, 'error');
       }
     } else {
       if (parseInt(s2X) === p2Config.sol) {
         showFeedback("Correct!", 'success');
         setTimeout(() => { setStep(3); setFeedback(null); }, 1000);
       } else {
-        showFeedback("Think: If 4 identical bags and a $20 service fee cost $100, then the bags alone cost $80. How much for one bag?", 'error');
+        showFeedback("Not quite — subtract the constant first. Almost there! What should you divide by to find x?", 'error');
       }
     }
   };
 
   const handleStep3 = () => {
+    setFeedback(null);
     if (!s3ShowX) {
       const target = `4x=${p3Config.total}`;
       if (normalize(s3Eq) === target || normalize(s3Eq) === `${p3Config.total}=4x`) {
         showFeedback("Perfect! Now find the value of one side.", 'success');
         setS3ShowX(true);
       } else {
-        showFeedback("Concept Hint: If a perimeter for an equilateral triangle with 3 equal sides 's' is 45, the equation is 3s = 45.", 'error');
+        showFeedback("Not quite — all 4 sides are equal. Almost there! What equation shows 4 equal sides adding up to the perimeter?", 'error');
       }
     } else {
       if (parseInt(s3X) === p3Config.sol) {
         setFeedback(null);
         setIsLevelComplete(true);
       } else {
-        showFeedback("Think: If 5 identical pizzas cost $50, how much is one pizza? (50 / 5). Divide the total perimeter by the 4 equal sides!", 'error');
+        showFeedback("Not quite — check how multiplication is affecting x. Almost there! What should you do to undo '× 4'?", 'error');
       }
     }
   };
@@ -139,27 +137,20 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
   return (
     <div className="flex flex-col items-center min-h-full p-6 text-white bg-gray-900 font-sans max-w-5xl mx-auto pb-24 relative">
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[110]">
-        <ProgressDots currentStep={step} totalSteps={3} onStepClick={(s) => setStep(s as 1|2|3)} />
+        <ProgressDots currentStep={step} totalSteps={3} />
       </div>
       
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
-      <InstructionModal isOpen={isInstructionOpen} onClose={() => setIsInstructionOpen(false)} title="Writing Equations">
-        <p>Turn shapes and scales into math sentences! Look at the parts and how they relate to the total to build your equations.</p>
-      </InstructionModal>
-
       {isLevelComplete && (
         <ChallengeCompleteModal
           stars={errorCount === 0 ? 3 : errorCount <= 3 ? 2 : 1}
           onReplay={() => { onSavePartialProgress?.(null); window.location.reload(); }}
-          onBackToMap={() => { isCompletedRef.current = true; onComplete(errorCount === 0 ? 3 : 2); }}
-          hintMessage="Simplify your equations precisely to earn all 3 stars!"
+          onBackToMap={() => { isCompletedRef.current = true; onComplete(errorCount === 0 ? 3 : errorCount <= 3 ? 2 : 1); }}
         />
       )}
 
       <div className="w-full bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700 mt-8">
         {step === 1 && (
           <div className="animate-fade-in flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest text-center">Puzzle 1: The Heavyweight Balance</h2>
             <div className="bg-gray-900/50 p-8 rounded-2xl mb-10 flex items-center justify-center gap-12 border-b-4 border-gray-700 shadow-inner">
                <div className="flex items-center gap-4">
                   {Array.from({ length: p1Config.xCount }).map((_, i) => (
@@ -196,17 +187,17 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
 
         {step === 2 && (
           <div className="animate-fade-in flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest">Puzzle 2: Perimeter Logic</h2>
-            <div className="relative w-64 h-44 bg-indigo-900/30 border-4 border-indigo-500 rounded-lg flex items-center justify-center mb-10 shadow-lg">
-               <span className="absolute -top-10 font-mono text-xl text-white">x + {p2Config.k}</span>
-               <span className="absolute -bottom-10 font-mono text-xl text-white">x + {p2Config.k}</span>
-               <span className="absolute -left-12 font-mono text-xl -rotate-90 text-white">x</span>
-               <span className="absolute -right-12 font-mono text-xl rotate-90 text-white">x</span>
-               <p className="text-center font-bold text-indigo-200">Perimeter = {p2Config.total}</p>
+            <div className="relative w-96 h-64 bg-indigo-900/30 border-4 border-indigo-500 rounded-lg flex items-center justify-center mb-16 shadow-lg mt-8">
+               <span className="absolute -top-12 font-mono text-2xl text-white">y</span>
+               <span className="absolute -bottom-12 font-mono text-2xl text-white">y</span>
+               <span className="absolute -left-14 font-mono text-2xl -rotate-90 text-white">x</span>
+               <span className="absolute -right-14 font-mono text-2xl rotate-90 text-white">x</span>
+               <p className="text-center font-bold text-indigo-200 text-xl">Perimeter = {p2Config.total}</p>
             </div>
-            <div className="space-y-6 w-full max-w-md mt-6">
-                <p className="text-center text-gray-300 font-bold">Write the equation for Perimeter:</p>
-                <input type="text" value={s2Eq} onChange={e => setS2Eq(e.target.value)} disabled={s2ShowX} className={`w-full bg-gray-900 border-2 p-4 rounded-xl text-center text-2xl font-mono text-white transition-all ${s2ShowX ? 'border-emerald-500' : 'border-sky-500 focus:ring-4 focus:ring-sky-400/30'}`} placeholder="Combine all 4 sides..." />
+            <div className="space-y-4 w-full max-w-md">
+                <p className="text-yellow-400 font-bold text-xl text-center">Let y = x + {p2Config.k}</p>
+                <p className="text-center text-gray-300 text-xl font-bold">Add all 4 sides to write the perimeter equation:</p>
+                <input type="text" value={s2Eq} onChange={e => setS2Eq(e.target.value)} disabled={s2ShowX} className={`w-full bg-gray-900 border-2 p-4 rounded-xl text-center text-2xl font-mono text-white transition-all ${s2ShowX ? 'border-emerald-500' : 'border-sky-500 focus:ring-4 focus:ring-sky-400/30'}`} placeholder={`x + y + x + y = ${p2Config.total}`} />
                 {!s2ShowX && <button onClick={handleStep2} className="w-full py-4 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xl shadow-lg uppercase tracking-widest active:scale-95">Check</button>}
                 {s2ShowX && (
                   <div className="animate-fade-in-up space-y-6 pt-6 border-t border-gray-700 w-full">
@@ -221,7 +212,6 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
 
         {step === 3 && (
           <div className="animate-fade-in flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest">Puzzle 3: The Square Plot</h2>
             <div className="w-48 h-48 bg-orange-900/30 border-4 border-orange-500 rounded-md flex items-center justify-center mb-10 relative shadow-lg">
                <span className="absolute -left-10 font-mono text-3xl text-white">x</span>
                <div className="flex flex-col items-center">
@@ -230,7 +220,7 @@ const ShapesEquationsLevel1: React.FC<LevelComponentProps> = ({ onComplete, onEx
                </div>
             </div>
             <div className="space-y-6 w-full max-w-md">
-                <p className="text-center text-gray-300 font-bold">Write the equation:</p>
+                <p className="text-center text-gray-300 text-xl font-bold">Write the equation:</p>
                 <input type="text" value={s3Eq} onChange={e => setS3Eq(e.target.value)} disabled={s3ShowX} className={`w-full bg-gray-900 border-2 p-4 rounded-xl text-center text-2xl font-mono text-white transition-all ${s3ShowX ? 'border-emerald-500' : 'border-sky-500 focus:ring-4 focus:ring-sky-400/30'}`} placeholder="Sum of 4 sides..." />
                 {!s3ShowX && <button onClick={handleStep3} className="w-full py-4 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xl shadow-lg uppercase tracking-widest active:scale-95">Check</button>}
                 {s3ShowX && (

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { LevelComponentProps } from '../types';
 import { getCompassChallengeResponse } from '../services/geminiService';
 import Spinner from '../components/Spinner';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 const CheckCircleIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -101,7 +100,6 @@ const CompassChallengeLevel: React.FC<LevelComponentProps> = ({ onComplete, topi
 
     return (
         <div className="flex flex-col items-center justify-center h-full p-4">
-            <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
             <InstructionModal
                 isOpen={isInstructionModalOpen}
                 onClose={() => setIsInstructionModalOpen(false)}

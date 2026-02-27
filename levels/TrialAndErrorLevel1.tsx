@@ -1,16 +1,12 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import type { LevelComponentProps } from '../types';
-import InstructionButton from '../components/InstructionButton';
-import InstructionModal from '../components/InstructionModal';
 import ProgressDots from '../components/ProgressDots';
 import ChallengeCompleteModal from '../components/ChallengeCompleteModal';
 
 const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit, partialProgress, onSavePartialProgress }) => {
   const [phase, setPhase] = useState<1 | 2 | 3>(() => partialProgress?.phase || 1);
   const [errorCount, setErrorCount] = useState(() => partialProgress?.errorCount || 0);
-  const [isInstructionOpen, setIsInstructionOpen] = useState(false);
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [showVerifyHint, setShowVerifyHint] = useState(false);
   const isCompletedRef = useRef(false);
@@ -37,6 +33,8 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
   
   const [tableErrors, setTableErrors] = useState<Set<string>>(new Set());
   const [verifyErrors, setVerifyErrors] = useState<Set<string>>(new Set());
+  const [showP1Hint, setShowP1Hint] = useState(false);
+  const [showP2Hint, setShowP2Hint] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -54,6 +52,26 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
       if (group === 'table') setTableErrors(prev => { const n = new Set(prev); n.delete(id); return n; });
       else setVerifyErrors(prev => { const n = new Set(prev); n.delete(id); return n; });
     }, 2000);
+  };
+
+  const handleP1Check = () => {
+    setShowP1Hint(false);
+    if (p1X === p1X_correct) {
+      setPhase(2);
+    } else {
+      setShowP1Hint(true);
+      setErrorCount(prev => prev + 1);
+    }
+  };
+
+  const handleP2Check = () => {
+    setShowP2Hint(false);
+    if (p2X === p2X_correct) {
+      setPhase(3);
+    } else {
+      setShowP2Hint(true);
+      setErrorCount(prev => prev + 1);
+    }
   };
 
   const handleP3CheckTable = () => {
@@ -97,32 +115,22 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
   return (
     <div className="flex flex-col items-center min-h-full p-4 text-white bg-gray-900 font-sans max-w-5xl mx-auto pb-20 relative">
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[110]">
-        <ProgressDots currentStep={phase} totalSteps={3} onStepClick={(s) => setPhase(s as 1|2|3)} />
+        <ProgressDots currentStep={phase} totalSteps={3} />
       </div>
       
-      <InstructionButton onClick={() => setIsInstructionOpen(true)} />
-      <InstructionModal isOpen={isInstructionOpen} onClose={() => setIsInstructionOpen(false)} title="Discovery Logic">
-        <p>Testing values is a great way to start solving! If you put a number in for 'x' and both sides of the '=' are the same, you've found the solution.</p>
-        <div className="mt-4 p-4 bg-sky-900/30 rounded-lg border border-sky-500/30">
-            <p className="text-sky-300 font-bold mb-1">Example Hint:</p>
-            <p className="italic">"If you have y + 10 = 15, try testing 5. Does 5 + 10 = 15? Yes! So y = 5."</p>
-        </div>
-      </InstructionModal>
-
       {isLevelComplete && (
         <ChallengeCompleteModal
           stars={errorCount === 0 ? 3 : errorCount <= 3 ? 2 : 1}
           onReplay={handleReplay}
-          onBackToMap={() => { isCompletedRef.current = true; onComplete(errorCount === 0 ? 3 : 2); }}
-          hintMessage="Try to get the right answer on your first guess for all three bars!"
+          onBackToMap={() => { isCompletedRef.current = true; onComplete(errorCount === 0 ? 3 : errorCount <= 3 ? 2 : 1); }}
         />
       )}
 
       <div className="w-full max-w-4xl bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700 mt-8">
         {phase === 1 && (
           <div className="animate-fade-in text-center flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest">Bar 1: Testing a Guess</h2>
-            <p className="text-gray-100 mb-10 text-4xl font-bold">Find x in <span className="text-indigo-300">x + {p1Config.a} = {p1Config.target}</span></p>
+            <p className="text-gray-100 mb-10 text-4xl font-bold">What's the value of X in the equation?</p>
+            <p className="text-gray-100 mb-10 text-4xl font-bold"><span className="text-indigo-300">X + {p1Config.a} = {p1Config.target}</span></p>
             <div className="flex items-center gap-6 mb-12">
               <div className="flex flex-col items-center">
                 <button onClick={() => setP1X(v => v + 1)} className="p-2 hover:text-sky-400"><svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" /></svg></button>
@@ -131,18 +139,17 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
               </div>
               <div className="text-5xl font-mono text-white">+ {p1Config.a} = {p1Config.target}</div>
             </div>
-            {p1X === p1X_correct ? (
-              <button onClick={() => setPhase(2)} className="bg-sky-600 hover:bg-sky-500 text-white px-12 py-4 rounded-xl font-bold text-2xl animate-fade-in-up shadow-lg border-b-4 border-sky-800">Check & Next &rarr;</button>
-            ) : (
-                <div className="text-gray-500 italic">"If you had y + 2 = 5, you'd test 3 because 3 + 2 = 5."</div>
+            <button onClick={handleP1Check} className="bg-sky-600 hover:bg-sky-500 text-white px-12 py-4 rounded-xl font-bold text-2xl shadow-lg border-b-4 border-sky-800 mb-6">Check</button>
+            {showP1Hint && (
+              <div className="text-yellow-400 font-semibold text-lg animate-fade-in">Not quite — For example: In X + 5 = 13, subtract 5 from both sides to find X = 8.</div>
             )}
           </div>
         )}
 
         {phase === 2 && (
           <div className="animate-fade-in text-center flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-6 uppercase tracking-widest">Bar 2: Multiplication Mystery</h2>
-            <p className="text-gray-100 mb-10 text-4xl font-bold">Find x in <span className="text-indigo-300">{p2Config.coeff}x = {p2Config.target}</span></p>
+            <p className="text-gray-100 mb-10 text-4xl font-bold">What's the value of X in the equation?</p>
+            <p className="text-gray-100 mb-10 text-4xl font-bold"><span className="text-indigo-300">{p2Config.coeff}X = {p2Config.target}</span></p>
             <div className="flex justify-center items-center gap-4 mb-12">
                <div className="text-6xl font-mono text-white">{p2Config.coeff} [</div>
                <div className="flex flex-col items-center">
@@ -152,26 +159,25 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
                </div>
                <div className="text-6xl font-mono text-white">] = {p2Config.target}</div>
             </div>
-            {p2X === p2X_correct ? (
-              <button onClick={() => setPhase(3)} className="bg-sky-600 hover:bg-sky-500 text-white px-12 py-4 rounded-xl font-bold text-2xl animate-fade-in-up shadow-lg border-b-4 border-sky-800">Check & Next &rarr;</button>
-            ) : (
-                <div className="text-gray-500 italic">"Think of 5z = 25. You know 5 times 5 is 25, so z must be 5!"</div>
+            <button onClick={handleP2Check} className="bg-sky-600 hover:bg-sky-500 text-white px-12 py-4 rounded-xl font-bold text-2xl shadow-lg border-b-4 border-sky-800 mb-6">Check</button>
+            {showP2Hint && (
+              <div className="text-yellow-400 font-semibold text-lg animate-fade-in">Not quite — For example: In 3X = 15, divide both sides by 3 to find X = 5.</div>
             )}
           </div>
         )}
 
         {phase === 3 && (
           <div className="animate-fade-in flex flex-col items-center">
-            <h2 className="text-xl font-bold text-sky-400 mb-2 uppercase tracking-widest text-center w-full">Bar 3: Side-by-Side Comparison</h2>
+            <p className="text-gray-100 mb-6 text-2xl font-bold text-center">Fill in the table to find which value makes both sides equal.</p>
             <div className="text-4xl font-mono mb-6 font-bold bg-gray-900/50 px-8 py-4 rounded-3xl border border-gray-700 text-white">
-               <span className="text-emerald-400">3x + 2</span> = <span className="text-orange-400">x + 4</span>
+               <span className="text-emerald-400">3X + 2</span> = <span className="text-orange-400">X + 4</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
               <div>
                 <table className="w-full text-center border-separate border-spacing-y-2">
                   <thead>
                     <tr className="text-gray-400 uppercase text-xs font-black tracking-widest">
-                      <th className="pb-4">x</th>
+                      <th className="pb-4">X</th>
                       <th className="pb-4 text-emerald-400">Left Side</th>
                       <th className="pb-4 text-orange-400">Right Side</th>
                     </tr>
@@ -191,7 +197,7 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
                   </tbody>
                 </table>
                 <div className="mt-8 flex flex-col items-center gap-4 text-xl bg-sky-900/20 p-4 rounded-2xl border border-sky-500/20 shadow-inner">
-                  <span className="font-bold text-white text-center">The pans are equal when x is ______</span>
+                  <span className="font-bold text-white text-center">The pans are equal when X is</span>
                   <input type="text" className={`w-20 bg-gray-900 text-white border-2 rounded-xl p-3 text-center font-bold text-3xl outline-none ${tableErrors.has('final-x') ? 'border-red-500 animate-shake' : 'border-sky-500'}`} value={p3FinalX} onChange={e => setP3FinalX(e.target.value)} />
                   {!p3ShowVerify && <button onClick={handleP3CheckTable} className="w-full py-4 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xl shadow-lg border-b-4 border-sky-800">Check</button>}
                 </div>
@@ -199,27 +205,28 @@ const TrialAndErrorLevel1: React.FC<LevelComponentProps> = ({ onComplete, onExit
               {p3ShowVerify && (
                 <div className="animate-fade-in-up space-y-6 relative">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-emerald-400 font-black text-xl uppercase tracking-widest">Verify Solution</h3>
+                    <h3 className="text-emerald-400 font-bold text-2xl">Check Your Answer</h3>
                     <button onClick={() => setShowVerifyHint(!showVerifyHint)} className="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 p-2 rounded-full transition-colors">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                     </button>
                     {showVerifyHint && (
-                        <div className="absolute top-12 right-0 w-64 bg-slate-800 border-2 border-yellow-500 p-4 rounded-xl shadow-2xl text-sm z-50 animate-fade-in-up font-bold">
-                            "If you found k = 10 for 2k = 20, you verify by checking if 2(10) is really 20."
+                        <div className="absolute top-12 right-0 w-64 bg-slate-800 border-2 border-yellow-500 p-4 rounded-xl shadow-2xl text-sm z-50 animate-fade-in-up font-bold text-yellow-300">
+                            Put your X value into both sides and check if they match!
                         </div>
                     )}
                   </div>
                   <div className="space-y-6 text-2xl font-mono text-white bg-gray-900/40 p-6 rounded-2xl border border-gray-700">
-                    <div className="flex items-center gap-1">
-                      <span>3(</span>
+                    <div className="flex items-center gap-2 flex-wrap justify-center">
+                      <span>3</span>
+                      <span>(</span>
                       {/* FIX: Corrected state variable and setter names (changed p2Verify to p3Verify and setP2Verify to setP3Verify) */}
                       <input type="text" className={`w-12 bg-gray-900 text-white border-b-2 text-center rounded ${verifyErrors.has('v1') ? 'border-red-500 animate-shake' : 'border-emerald-500'}`} value={p3Verify.v1} onChange={e => setP3Verify({...p3Verify, v1: e.target.value})} />
-                      <span>) + 2 = (</span>
-                      {/* FIX: Corrected state variable and setter names (changed p2Verify to p3Verify and setP2Verify to setP3Verify) */}
+                      <span>)</span>
+                      <span>+ 2 =</span>
                       <input type="text" className={`w-12 bg-gray-900 text-white border-b-2 text-center rounded ${verifyErrors.has('v2') ? 'border-red-500 animate-shake' : 'border-orange-500'}`} value={p3Verify.v2} onChange={e => setP3Verify({...p3Verify, v2: e.target.value})} />
-                      <span>) + 4</span>
+                      <span>+ 4</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-center">
                       {/* FIX: Corrected state variable and setter names (changed p2Verify to p3Verify and setP2Verify to setP3Verify) */}
                       <input type="text" className={`w-14 bg-gray-900 text-white border-b-2 text-center rounded ${verifyErrors.has('v3') ? 'border-red-500 animate-shake' : 'border-emerald-500'}`} value={p3Verify.v3} onChange={e => setP3Verify({...p3Verify, v3: e.target.value})} />
                       <span>+ 2 = </span>

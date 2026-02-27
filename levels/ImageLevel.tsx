@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import type { LevelComponentProps, QuizQuestion } from '../types';
 import { generateImageForTopic, generateQuestionForTopic } from '../services/geminiService';
 import Spinner from '../components/Spinner';
-import InstructionButton from '../components/InstructionButton';
 import InstructionModal from '../components/InstructionModal';
 
 const ImageLevel: React.FC<LevelComponentProps> = ({ topic, onComplete }) => {
@@ -64,7 +63,6 @@ const ImageLevel: React.FC<LevelComponentProps> = ({ topic, onComplete }) => {
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center h-full gap-8 p-4">
-      <InstructionButton onClick={() => setIsInstructionModalOpen(true)} />
       <InstructionModal
         isOpen={isInstructionModalOpen}
         onClose={() => setIsInstructionModalOpen(false)}
